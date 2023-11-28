@@ -13,5 +13,5 @@ class Dataset:
         train_set_size = int(training_ratio * len(self.df))
 
         # Store training and evaluation sets
-        self.train_df = self.df.iloc[:train_set_size] if if_shuffle else self.df.iloc[:train_set_size]
-        self.eval_df = self.df.iloc[train_set_size:] if if_shuffle else self.df.iloc[train_set_size:]
+        self.train_df = self.df.iloc[:train_set_size]
+        self.eval_df = self.df.iloc[train_set_size:]
