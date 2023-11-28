@@ -12,6 +12,14 @@ class Dataset:
         # Get the training set size based on given training ratio
         train_set_size = int(training_ratio * len(self.df))
 
-        # Store training and evaluation sets
-        self.train_df = self.df.iloc[:train_set_size]
-        self.eval_df = self.df.iloc[train_set_size:]
+        n_cols = len(self.df.columns)
+
+        # Get the training set and store training features and labels
+        train_df: pd.DataFrame = self.df.iloc[:train_set_size]
+        self.train_X = train_df.iloc[:, :n_cols-1].to_numpy()
+        self.train_y = train_df.iloc[:, n_cols-1:].to_numpy()
+
+        # Get the evaluation set and store evaluation features and labels
+        eval_df: pd.DataFrame = self.df.iloc[train_set_size:]
+        self.eval_X = eval_df.iloc[:, :n_cols-1].to_numpy()
+        self.eval_y = eval_df.iloc[:, n_cols-1:].to_numpy()
