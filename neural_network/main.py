@@ -1,11 +1,12 @@
 
 
 def main():
-    import pandas as pd
+    from neural_network.dataset import Dataset
 
-    # Import the iris dataset
-    iris_df = pd.read_csv('resources/iris.csv', index_col=0)
-    print(iris_df)
+    dataset = Dataset('resources/iris.csv', 0.8)
+    print(dataset.df)
+    print(dataset.train_df)
+    print(dataset.eval_df)
 
 
 if __name__ == '__main__':
