@@ -1,3 +1,6 @@
+"""
+Module responsible for the datasets management from the csv file
+"""
 import pandas as pd
 
 

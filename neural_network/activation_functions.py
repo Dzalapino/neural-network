@@ -21,5 +21,6 @@ def softmax(output: np.ndarray) -> np.ndarray:
     :param output: output: output values from the neurons after calculating the weighted sum of inputs
     :return: transformed array of outputs
     """
+    # Optimization for the big numbers
     exp_values = np.exp(output - np.max(output, axis=1, keepdims=True))
     return exp_values / np.sum(exp_values, axis=1, keepdims=True)

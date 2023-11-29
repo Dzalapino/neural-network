@@ -1,3 +1,7 @@
+"""
+Module responsible for the layers creation and management.
+It stores all neurons weights, biases and calculates outputs based on provided activation function
+"""
 import numpy as np
 from typing import Callable
 
