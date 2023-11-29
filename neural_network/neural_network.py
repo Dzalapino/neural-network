@@ -24,5 +24,8 @@ class NeuralNetwork:
     def add_layer(self, n_inputs: int, n_neurons: int, activation_function: Callable[[np.ndarray], np.ndarray]) -> None:
         self.layers.append(Layer(n_inputs, n_neurons, activation_function))
 
+    def calculate_loss(self):
+        pass
+
     def train(self) -> None:
         pass
