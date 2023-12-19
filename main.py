@@ -1,5 +1,3 @@
-# Description: This file is used to train and test the neural network.
-
 def main():
     from neural_network.dataset import Dataset
     import neural_network.activation_functions as activation_functions
@@ -12,7 +10,7 @@ def main():
     model.add_layer(10, 8, activation_functions.relu, activation_functions.relu_derivative)
     model.add_layer(8, 3, activation_functions.softmax, None)
 
-    model.train(dataset.train_X, dataset.train_y, 15, 0.004, True)
+    model.train(dataset.train_X, dataset.train_y, 12, 0.004, True)
     model.evaluate(dataset.eval_X, dataset.eval_y)
 
 
