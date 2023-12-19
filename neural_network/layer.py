@@ -18,7 +18,7 @@ class Layer:
         :param activation_function: neuron activation function
         :param activation_derivative: neuron activation function derivative
         """
-        # Init weights using He initialization. Normal(mean, standard_deviation)
+        # Init weights using Kaiming He initialization. Normal(mean, standard_deviation)
         np.random.seed(42)  # For reproducibility
         self.weights: np.ndarray = np.random.normal(0, np.sqrt(2 / n_inputs), (n_inputs, n_neurons))
         # Init biases and outputs
@@ -30,8 +30,8 @@ class Layer:
 
     def forward_pass(self, inputs) -> None:
         """
-        Calculates the outputs of the layer based on the inputs
-        :param inputs: inputs to the layer
+        Calculates the outputs of the layer based on the given input data
+        :param inputs: Inputs to the layer
         :return: None
         """
         # Calculate the outputs of the layer
