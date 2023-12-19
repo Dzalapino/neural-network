@@ -26,11 +26,11 @@ def main():
     # Set the x-axis ticks to be the same as the number of epochs
     axs[0].set_xticks(range(len(model.accuracy_for_epoch)))
     # Plot the loss
-    axs[1].plot(model.loss_for_epoch)
+    axs[1].plot(model.avg_loss_for_epoch)
     axs[1].set_ylabel('Loss')
     axs[1].set_xlabel('Epoch')
     # Set the x-axis ticks to be the same as the number of epochs
-    axs[1].set_xticks(range(len(model.loss_for_epoch)))
+    axs[1].set_xticks(range(len(model.avg_loss_for_epoch)))
     plt.show()
 
 

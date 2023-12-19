@@ -35,7 +35,7 @@ class NeuralNetwork:
     """
     def __init__(self):
         self.layers: list[Layer] = []
-        self.loss_for_epoch = list[float]()
+        self.avg_loss_for_epoch = list[float]()
         self.accuracy_for_epoch = list[float]()
         self.eval_avg_loss = 0.
         self.eval_accuracy = 0.
@@ -151,11 +151,11 @@ class NeuralNetwork:
                     self.layers[layer].weights -= learning_rate * loss_dwrt_weights
                     self.layers[layer].biases -= learning_rate * loss_dwrt_biases
 
-            self.loss_for_epoch.append(total_loss / np.size(train_x, axis=0))
+            self.avg_loss_for_epoch.append(total_loss / np.size(train_x, axis=0))
             self.accuracy_for_epoch.append(accurate_predictions / (accurate_predictions + not_accurate_predictions))
             if if_print:
                 print(f'  Total Loss after epoch {epoch + 1}: {total_loss}\n'
-                      f'  Avg loss after epoch {epoch + 1}: {self.loss_for_epoch[-1]}\n'
+                      f'  Avg loss after epoch {epoch + 1}: {self.avg_loss_for_epoch[-1]}\n'
                       f'  Accuracy after epoch {epoch + 1}: {self.accuracy_for_epoch[-1]}')
 
     def evaluate(self, eval_x: np.ndarray, eval_y: np.ndarray) -> None:
