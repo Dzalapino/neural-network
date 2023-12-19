@@ -47,6 +47,13 @@ class NeuralNetwork:
         if if_print:
             print('Starting training the model...')
         for epoch in range(learning_epochs):
+            # Shuffle the training features and labels before each epoch
+            indices = np.arange(len(train_x))
+            np.random.shuffle(indices)
+            print(indices)
+            train_x = train_x[indices]
+            train_y = train_y[indices]
+
             if if_print:
                 print(f'  epoch {epoch}:')
             for train_sample, y in zip(train_x, train_y):
@@ -113,13 +120,6 @@ class NeuralNetwork:
                     # Update the hidden layer weights and biases
                     self.layers[layer].weights -= learning_rate * loss_dwrt_weights
                     self.layers[layer].biases -= learning_rate * loss_dwrt_biases
-
-            # Shuffle the training features and labels after each epoch
-            indices = np.arange(len(train_x))
-            np.random.shuffle(indices)
-            print(indices)
-            train_x = train_x[indices]
-            train_y = train_y[indices]
 
             self.avg_loss = self.total_loss / np.size(train_x, axis=0)
             if if_print:
