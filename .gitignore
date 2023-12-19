@@ -13,3 +13,4 @@
 /.idea/vcs.xml
 /.idea/workspace.xml
 neural_network/__pycache__/
+neural_network/poetry.lock

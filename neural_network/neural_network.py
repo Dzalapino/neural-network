@@ -9,14 +9,24 @@ from typing import Callable
 from neural_network.layer import Layer
 
 
-def calculate_loss(expected_values: np.ndarray, predicted_values: np.ndarray):
+def calculate_loss(expected_values: np.ndarray, predicted_values: np.ndarray) -> float:
     """
-    Method for calculation loss function for categorical cross entropy
+    Method for calculation the categorical cross entropy loss for the sample
     :param expected_values: Expected values (labels)
     :param predicted_values: Predicted values (outputs from the last layer)
     :return: Loss function value for categorical cross entropy
     """
-    return -1 * np.sum(expected_values * np.log(predicted_values + 1e-15))
+    return -1 * np.sum(expected_values * np.log(predicted_values + 1e-15))  # Add 1e-15 to avoid log(0)
+
+
+def is_prediction_accurate(expected_values: np.ndarray, predicted_values: np.ndarray) -> bool:
+    """
+    Method for checking if the prediction is accurate for the sample
+    :param expected_values: Expected values (labels)
+    :param predicted_values: Predicted values (outputs from the last layer)
+    :return: True if the prediction is accurate, False otherwise
+    """
+    return np.argmax(expected_values) == np.argmax(predicted_values)
 
 
 class NeuralNetwork:
@@ -25,9 +35,10 @@ class NeuralNetwork:
     """
     def __init__(self):
         self.layers: list[Layer] = []
-        self.loss = 0.
-        self.total_loss = 0.
-        self.avg_loss = 0.
+        self.loss_for_epoch = list[float]()
+        self.accuracy_for_epoch = list[float]()
+        self.eval_avg_loss = 0.
+        self.eval_accuracy = 0.
 
     def add_layer(self, n_inputs: int, n_neurons: int, activation_function: Callable[[np.ndarray], np.ndarray],
                   activation_derivative: Callable[[np.ndarray], np.ndarray] | None) -> None:
@@ -53,23 +64,25 @@ class NeuralNetwork:
         :param if_print: If True, the method will print the loss after each epoch
         :return: None
         """
-        print(train_x)
-        print(train_y)
         if if_print:
             print('Starting training the model...')
         for epoch in range(learning_epochs):
+            total_loss = 0.  # Reset the total loss for each epoch
+            accurate_predictions = 0  # Reset the number of accurate predictions for each epoch
+            not_accurate_predictions = 0  # Reset the number of not accurate predictions for each epoch
+
             # Shuffle the training features and labels before each epoch
             indices = np.arange(len(train_x))
             np.random.shuffle(indices)
-            print(indices)
             train_x = train_x[indices]
             train_y = train_y[indices]
 
             if if_print:
-                print(f'  epoch {epoch}:')
+                print(f'  epoch {epoch + 1}:')
             for train_sample, y in zip(train_x, train_y):
                 if if_print:
                     print('\n    Forward propagation...')
+
                 # Forward propagation
                 self.layers[0].forward_pass(train_sample)  # Feed first layer with inputs from the data set
                 for i in range(1, len(self.layers)):
@@ -77,11 +90,17 @@ class NeuralNetwork:
                     self.layers[i].forward_pass(self.layers[i-1].get_activated_outputs())
 
                 # Calculate categorical cross entropy loss
-                self.loss = calculate_loss(y, self.layers[-1].get_activated_outputs())
-                self.total_loss += self.loss
+                loss = calculate_loss(y, self.layers[-1].get_activated_outputs())
+
+                # Increase total loss for the epoch and check if the prediction is accurate or not
+                total_loss += loss
+                if is_prediction_accurate(y, self.layers[-1].get_activated_outputs()):
+                    accurate_predictions += 1
+                else:
+                    not_accurate_predictions += 1
 
                 if if_print:
-                    print(f'    Loss after forward pass: {self.loss}\n    Backward propagation...')
+                    print(f'    Loss after forward pass: {loss}\n    Backward propagation...')
                 # Backward propagation
                 # Calculate the derivative of the loss function with respect to the last layer outputs
                 loss_dwrt_output = self.layers[-1].get_activated_outputs() - y
@@ -132,9 +151,12 @@ class NeuralNetwork:
                     self.layers[layer].weights -= learning_rate * loss_dwrt_weights
                     self.layers[layer].biases -= learning_rate * loss_dwrt_biases
 
-            self.avg_loss = self.total_loss / np.size(train_x, axis=0)
+            self.loss_for_epoch.append(total_loss / np.size(train_x, axis=0))
+            self.accuracy_for_epoch.append(accurate_predictions / (accurate_predictions + not_accurate_predictions))
             if if_print:
-                print(f'  Total Loss after epoch {epoch}: {self.total_loss}\n  Avg loss after epoch {epoch}: {self.avg_loss}')
+                print(f'  Total Loss after epoch {epoch + 1}: {total_loss}\n'
+                      f'  Avg loss after epoch {epoch + 1}: {self.loss_for_epoch[-1]}\n'
+                      f'  Accuracy after epoch {epoch + 1}: {self.accuracy_for_epoch[-1]}')
 
     def evaluate(self, eval_x: np.ndarray, eval_y: np.ndarray) -> None:
         """
@@ -144,6 +166,8 @@ class NeuralNetwork:
         :return: None
         """
         total_loss = 0
+        accurate_predictions = 0
+        not_accurate_predictions = 0
         for evaluation_sample, y in zip(eval_x, eval_y):
             # Forward propagation
             self.layers[0].forward_pass(evaluation_sample)  # Feed first layer with inputs from the data set
@@ -153,12 +177,18 @@ class NeuralNetwork:
 
             # Calculate categorical cross entropy loss
             loss = calculate_loss(y, self.layers[-1].get_activated_outputs())
+
+            # Increase total loss for the epoch and check if the prediction is accurate or not
             total_loss += loss
-            print(f'\nFor the evaluation sample: {evaluation_sample} = {y}')
-            np.set_printoptions(precision=3, suppress=True)
-            print(f'Model estimation: {self.layers[-1].get_activated_outputs()}')
-            print(f'Loss: {loss}')
-        print(f'\nAvg loss of the model: {total_loss/len(eval_x)}')
+            if is_prediction_accurate(y, self.layers[-1].get_activated_outputs()):
+                accurate_predictions += 1
+            else:
+                not_accurate_predictions += 1
+
+        self.eval_avg_loss = total_loss / np.size(eval_x, axis=0)
+        print(f'\nAvg loss of the model on the evaluation dataset: {self.eval_avg_loss}\n'
+              f'Accuracy of the model on the evaluation dataset: '
+              f'{accurate_predictions / (accurate_predictions + not_accurate_predictions)}')
 
     def __str__(self):
         n_layers = len(self.layers)
