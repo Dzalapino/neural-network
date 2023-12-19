@@ -1,5 +1,6 @@
 """
-Module containing all activation functions that may be used in the neural net layers
+Module containing all activation functions used in the neural network model
+and their derivatives for backpropagation
 """
 import numpy as np
 

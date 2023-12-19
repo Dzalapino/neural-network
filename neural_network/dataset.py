@@ -1,5 +1,6 @@
 """
 Module responsible for the datasets management from the csv file
+it also splits the data into training and evaluation sets based on the given ratio
 """
 import pandas as pd
 import numpy as np
@@ -7,16 +8,22 @@ import numpy as np
 
 class Dataset:
     def __init__(self, path: str, training_ratio=0.8, has_index_col=True, if_shuffle=True):
-        # Import the data
+        """
+        Method for initializing the dataset from the csv file and splitting it
+        into training and evaluation sets based on the given ratio
+        :param path: path to the csv file
+        :param training_ratio: ratio of the training set size to the whole dataset size
+        :param has_index_col: if the csv file has index column
+        :param if_shuffle: if the dataset should be shuffled
+        """
+        # Import the data from the csv file
         self.df: pd.DataFrame = (pd.read_csv(path, index_col=0) if has_index_col else pd.read_csv(path))
-        # Shuffle the data
+        # Shuffle the data if needed
         if if_shuffle:
             self.df: pd.DataFrame = self.df.sample(frac=1, random_state=42).reset_index(drop=True)
 
-        # Get the training set size based on given training ratio
+        # Get the training set size, number of columns and unique label classes
         train_set_size = int(training_ratio * len(self.df))
-
-        # Get the number of columns and set of unique classes
         n_cols = len(self.df.columns)
         unique_classes = self.df.iloc[:, -1].unique()
 

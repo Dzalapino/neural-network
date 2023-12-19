@@ -1,5 +1,7 @@
 """
-Module containing the code responsible for the neural network model and everything that comes with it
+Module containing the code responsible for the neural network model and its training and evaluation.
+The neural network model is a list of layers. Each layer is an object of the Layer class.
+The neural network model is trained using the train method. The evaluation is performed using the evaluate method.
 """
 
 import numpy as np
@@ -7,41 +9,50 @@ from typing import Callable
 from neural_network.layer import Layer
 
 
-# Method for calculation loss function for categorical cross entropy
 def calculate_loss(expected_values: np.ndarray, predicted_values: np.ndarray):
+    """
+    Method for calculation loss function for categorical cross entropy
+    :param expected_values: Expected values (labels)
+    :param predicted_values: Predicted values (outputs from the last layer)
+    :return: Loss function value for categorical cross entropy
+    """
     return -1 * np.sum(expected_values * np.log(predicted_values + 1e-15))
 
 
-# Neural network class that stores all layers and performs forward and backward propagation
 class NeuralNetwork:
+    """
+    Class representing the neural network model
+    """
     def __init__(self):
         self.layers: list[Layer] = []
         self.loss = 0.
         self.total_loss = 0.
         self.avg_loss = 0.
 
-    def __str__(self):
-        n_layers = len(self.layers)
-        s = f'Neural network with {n_layers} layers:'
-        for i in range(n_layers):
-            s += f'\nLayer {i+1}:\n'
-            s += str(self.layers[i])
-        return s
-
     def add_layer(self, n_inputs: int, n_neurons: int, activation_function: Callable[[np.ndarray], np.ndarray],
                   activation_derivative: Callable[[np.ndarray], np.ndarray] | None) -> None:
         """
         Method for adding a new layer to the neural network model
-        :param n_inputs: number of inputs to the layer
-        :param n_neurons: number of neurons in the layer
-        :param activation_function: activation function for the layer
-        :param activation_derivative: derivative of the activation function for the layer
-        :return:
+        :param n_inputs: Number of inputs to the layer (number of neurons in the previous layer)
+        :param n_neurons: Number of neurons in the layer (number of outputs from the layer)
+        :param activation_function: Activation function for the layer (e.g. sigmoid, relu, softmax)
+        :param activation_derivative: Derivative of the activation function for the layer (e.g. sigmoid_derivative,
+        :return: None
         """
         self.layers.append(Layer(n_inputs, n_neurons, activation_function, activation_derivative))
 
     def train(self, train_x: np.ndarray, train_y: np.ndarray, learning_epochs=100,
               learning_rate=0.005, if_print=False) -> None:
+        """
+        Method for training the neural network model on the given training data set.
+        The training is performed using the gradient descent method.
+        :param train_x: Training data set features (inputs)
+        :param train_y: Training data set labels (expected values)
+        :param learning_epochs: Learning epochs for the gradient descent method
+        :param learning_rate: Learning rate for the gradient descent method
+        :param if_print: If True, the method will print the loss after each epoch
+        :return: None
+        """
         print(train_x)
         print(train_y)
         if if_print:
@@ -126,6 +137,12 @@ class NeuralNetwork:
                 print(f'  Total Loss after epoch {epoch}: {self.total_loss}\n  Avg loss after epoch {epoch}: {self.avg_loss}')
 
     def evaluate(self, eval_x: np.ndarray, eval_y: np.ndarray) -> None:
+        """
+        Method for evaluating the model on the given evaluation data set (not used for training).
+        :param eval_x: Evaluation data set features (inputs)
+        :param eval_y: Evaluation data set labels (expected values)
+        :return: None
+        """
         total_loss = 0
         for evaluation_sample, y in zip(eval_x, eval_y):
             # Forward propagation
@@ -142,3 +159,11 @@ class NeuralNetwork:
             print(f'Model estimation: {self.layers[-1].get_activated_outputs()}')
             print(f'Loss: {loss}')
         print(f'\nAvg loss of the model: {total_loss/len(eval_x)}')
+
+    def __str__(self):
+        n_layers = len(self.layers)
+        s = f'Neural network with {n_layers} layers:'
+        for i in range(n_layers):
+            s += f'\nLayer {i+1}:\n'
+            s += str(self.layers[i])
+        return s
