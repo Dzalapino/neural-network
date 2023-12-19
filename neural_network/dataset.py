@@ -2,6 +2,7 @@
 Module responsible for the datasets management from the csv file
 """
 import pandas as pd
+import numpy as np
 
 
 class Dataset:
@@ -21,14 +22,14 @@ class Dataset:
 
         # Get the training set and store training features and labels
         train_df: pd.DataFrame = self.df.iloc[:train_set_size]
-        self.train_X = train_df.iloc[:, :n_cols - 1].to_numpy()
+        self.train_X = np.array(train_df.iloc[:, :n_cols - 1].to_numpy())
         # Transform the training label samples with one hot encoding
-        self.train_y = [[1 if sample == unique else 0 for unique in unique_classes]
-                        for sample in train_df.iloc[:, -1].to_numpy().flatten()]
+        self.train_y = np.array([[1 if sample == unique else 0 for unique in unique_classes]
+                                 for sample in train_df.iloc[:, -1].to_numpy().flatten()])
 
         # Get the evaluation set and store evaluation features and labels
         eval_df: pd.DataFrame = self.df.iloc[train_set_size:]
-        self.eval_X = eval_df.iloc[:, :n_cols - 1].to_numpy()
+        self.eval_X = np.array(eval_df.iloc[:, :n_cols - 1].to_numpy())
         # Transform the evaluation label samples with one hot encoding
-        self.eval_y = [[1 if sample == unique else 0 for unique in unique_classes]
-                       for sample in eval_df.iloc[:, -1].to_numpy().flatten()]
+        self.eval_y = np.array([[1 if sample == unique else 0 for unique in unique_classes]
+                                for sample in eval_df.iloc[:, -1].to_numpy().flatten()])

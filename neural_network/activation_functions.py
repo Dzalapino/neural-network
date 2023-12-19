@@ -14,13 +14,23 @@ def relu(output: np.ndarray) -> np.ndarray:
     return np.maximum(0, output)
 
 
+def relu_derivative(output: np.ndarray) -> np.ndarray:
+    """
+    Calculate the derivative of the ReLU (Rectified Linear Unit) activation function.
+    :param output: output values from the neurons after applying the ReLU function
+    :return: derivative array of the ReLU function outputs
+    """
+    return np.where(output > 0, 1, 0)
+
+
 def softmax(output: np.ndarray) -> np.ndarray:
     """
     The softmax function, also known as normalized exponential function,
     converts a vector of K real numbers into a probability distribution of K possible outcomes.
+    To optimize solution against big numbers we subtract the max value from all values
     :param output: output: output values from the neurons after calculating the weighted sum of inputs
     :return: transformed array of outputs
     """
     # Optimization for the big numbers
-    exp_values = np.exp(output - np.max(output, axis=1, keepdims=True))
-    return exp_values / np.sum(exp_values, axis=1, keepdims=True)
+    exp_values = np.exp(output - np.max(output, keepdims=True))
+    return exp_values / np.sum(exp_values, keepdims=True)
